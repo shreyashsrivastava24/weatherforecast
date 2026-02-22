@@ -25,6 +25,7 @@ const SSValue = document.getElementById("SSValue");
 const CValue = document.getElementById("CValue");
 const UVValue = document.getElementById("UVValue");
 const PValue = document.getElementById("PValue");
+const planner = document.querySelector(".planner");
 
 
 // ================== AUTO LOAD ==================
@@ -54,7 +55,7 @@ async function findUserLocation() {
     updateMainWeather(data);
 
     // -------- UV INDEX --------
-    getUVIndex(data.coord.lat, data.coord.lon);
+    getUVIndex(data);
 
     // -------- FORECAST --------
     getForecast(cityName);
@@ -121,14 +122,56 @@ function updateMainWeather(data) {
 
 
 // ================== UV INDEX ==================
-async function getUVIndex(lat, lon) {
+async function getUVIndex(data) {
   try {
-    const res = await fetch(`${UV_API}lat=${lat}&lon=${lon}`);
+    const res = await fetch(`${UV_API}lat=${data.coord.lat}&lon=${data.coord.lon}`);
     const uvData = await res.json();
     UVValue.innerHTML = Math.round(uvData.value);
+
+    // Update planner
+    updatePlanner(data, uvData.value);
   } catch {
     UVValue.innerHTML = "N/A";
+
+    // Update planner with no UV
+    updatePlanner(data, null);
   }
+}
+
+
+// ================== FEELS LIKE PLANNER ==================
+function updatePlanner(data, uvIndex) {
+  let suggestion = "";
+  let iconClass = "";
+  const temp = data.main.temp;
+  const weatherDesc = data.weather[0].description.toLowerCase();
+
+  if (uvIndex !== null && temp > 35 && uvIndex > 7) {
+    suggestion = "Avoid Direct Sun";
+    iconClass = "fa-sun";
+  } else if (temp > 30) {
+    suggestion = "Stay Hydrated";
+    iconClass = "fa-glass-water";
+  } else if (temp < 10) {
+    suggestion = "Light Jacket Recommended";
+    iconClass = "fa-shirt";
+  } else if (uvIndex !== null && uvIndex > 7) {
+    suggestion = "High UV – Sunscreen Needed";
+    iconClass = "fa-sun";
+  } else if (weatherDesc.includes("rain") || weatherDesc.includes("drizzle")) {
+    suggestion = "Carry Umbrella";
+    iconClass = "fa-umbrella";
+  } else {
+    suggestion = "Enjoy the Weather!";
+    iconClass = "fa-smile";
+  }
+
+  planner.innerHTML = `
+    <div class="planner-icon">
+      <i class="fa-solid ${iconClass}"></i>
+    </div>
+    <div class="planner-text">${suggestion}</div>
+  `;
 }
 
 
@@ -137,6 +180,7 @@ async function getForecast(cityName) {
   try {
     const res = await fetch(FORECAST_API + cityName);
     const forecastData = await res.json();
+    console.log(forecastData)
 
     const daily = {};
 
@@ -165,6 +209,7 @@ async function getForecast(cityName) {
 
 // ================== FORECAST CARD ==================
 function createForecastCard(dayData) {
+  //...spread operator h jo array ko tod tod k individual values bna deta
   const maxTemp = Math.max(...dayData.temps);
   const minTemp = Math.min(...dayData.temps);
 

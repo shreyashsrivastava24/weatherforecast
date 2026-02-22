@@ -104,13 +104,66 @@ body {
   font-size: 25px;
 }
 
+.planner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 15px;
+  padding: 15px 20px;
+  margin: 15px 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.planner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.planner:hover::before {
+  left: 100%;
+}
+
+.planner:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.planner-icon {
+  margin-right: 12px;
+  font-size: 24px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.planner-text {
+  font-size: 16px;
+  text-align: center;
+}
+
 .weather-output {
   width: 75%;
   position: fixed;
   inset: 0;
   margin-left: 25%;
   padding: 32px; /* 2rem */
-  background: #f6f6f8;
+  background: lavenderblush;
   overflow: auto;
 }
 
